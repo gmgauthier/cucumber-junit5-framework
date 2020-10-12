@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class Stepdefs {
     private String url;
-    protected RemoteWebDriver driver;
+    private RemoteWebDriver driver;
 
     @Before
     public void setUp() {
