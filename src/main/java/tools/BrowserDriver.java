@@ -20,11 +20,9 @@ import java.util.List;
 public class BrowserDriver extends RemoteWebDriver {
     private final RemoteWebDriver driver;
     private final String browser;
-    private final Boolean headless;
 
     public BrowserDriver(final String browser, final Boolean headless){
         this.browser = browser;
-        this.headless = headless;
 
         switch (browser) {
             case "chrome":  this.driver = getChrome(headless);
@@ -47,7 +45,7 @@ public class BrowserDriver extends RemoteWebDriver {
         validateBrowser();
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.setHeadless(true);
+        options.setHeadless(headless);
         options.addArguments("--ignore-certificate-errors"); // only for limited test envs
         return new ChromeDriver(options);
     }
@@ -56,7 +54,7 @@ public class BrowserDriver extends RemoteWebDriver {
         validateBrowser();
         WebDriverManager.firefoxdriver().setup();
         FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(true);
+        options.setHeadless(headless);
         options.addArguments("--ignore-certificate-errors");
         return new FirefoxDriver(options);
     }
