@@ -13,16 +13,17 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 
 public class BrowserDriver extends RemoteWebDriver {
     private final RemoteWebDriver driver;
-    private final String browser;
+    private final String osName = System.getProperty("os.name");
 
-    public BrowserDriver(final String browser, final Boolean headless){
-        this.browser = browser;
+    public BrowserDriver(final String browser, final Boolean headless) {
 
         switch (browser) {
             case "chrome":  this.driver = getChrome(headless);
@@ -42,7 +43,6 @@ public class BrowserDriver extends RemoteWebDriver {
     }
 
     private RemoteWebDriver getChrome(final Boolean headless){
-        validateBrowser();
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setHeadless(headless);
@@ -51,7 +51,6 @@ public class BrowserDriver extends RemoteWebDriver {
     }
 
     private RemoteWebDriver getFirefox(final Boolean headless){
-        validateBrowser();
         WebDriverManager.firefoxdriver().setup();
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(headless);
@@ -60,7 +59,10 @@ public class BrowserDriver extends RemoteWebDriver {
     }
 
     private RemoteWebDriver getEdge(final Boolean headless){
-        validateBrowser();
+        List<String> osNames = Arrays.asList("Windows 10", "Mac OS X");
+        if (!osNames.contains(osName)){
+            throw new UnreachableBrowserException("Edge browser not available on this platform");
+        }
         WebDriverManager.edgedriver().setup();
         EdgeOptions options = new EdgeOptions();
         //if (headless.equals(true)){ // necessary for Selenium 3
@@ -76,7 +78,10 @@ public class BrowserDriver extends RemoteWebDriver {
     }
 
     private SafariDriver getSafari(final Boolean headless){
-        validateBrowser();
+        String osName = System.getProperty("os.name");
+        if (!osName.contentEquals("Mac OS X")){
+            throw new UnreachableBrowserException("Safari browser not available on this platform");
+        }
         if (headless.equals(true)){
             throw new UnsupportedOperationException("Safari does not support headless execution yet");
         }
@@ -85,14 +90,14 @@ public class BrowserDriver extends RemoteWebDriver {
         return new SafariDriver(options);
     }
 
-    private void validateBrowser() {
-        String osName = System.getProperty("os.name");
-        if (browser.contentEquals("safari") && !osName.contentEquals("Mac OS X")){
-            throw new UnreachableBrowserException("Safari browser not available on this platform");
-        }
-        List<String> osNames = Arrays.asList("Windows 10", "Mac OS X");
-        if (browser.contentEquals("edge") && !osNames.contains(osName)){
-            throw new UnreachableBrowserException("Edge browser not available on this platform");
-        }
+    private Path findFile(Path targetDir, String fileName) throws IOException {
+        return Files.list(targetDir).filter( (p) -> {
+            if (Files.isRegularFile(p)) {
+                return p.getFileName().toString().equals(fileName);
+            } else {
+                return false;
+            }
+        }).findFirst().orElse(null);
     }
+
 }
