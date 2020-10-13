@@ -31,7 +31,7 @@ public class Stepdefs {
     public void i_have_a_driver_for(String browser) {
         boolean headless = true;
         if (browser.contains("safari")) headless = false;
-        driver = new BrowserDriver(browser, headless).getDriver();
+        driver = BrowserDriver.getDriver(browser, headless);
     }
 
     @When("I navigate to test.io")
